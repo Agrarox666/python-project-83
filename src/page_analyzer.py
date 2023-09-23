@@ -8,6 +8,6 @@ def handler():
     return 'Hello third project!'
 
 
-@app.route('/show/<id>')
+@app.route('/show/<ids>')
 def get_show(ids):
     return f'Show me your{ids}'

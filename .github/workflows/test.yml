@@ -8,5 +8,8 @@ jobs:
     - name: checkout repo
       uses: actions/checkout@v3
 
+    - name: install dependencies
+      run: pip install poetry
+
     - name: Run linter
       run: make lint

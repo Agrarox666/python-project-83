@@ -1,9 +1,14 @@
 from datetime import datetime
 
-import psycopg2
+import psycopg
 
 from src import app, DATABASE_URL
-from flask import render_template, request, redirect, url_for, flash, get_flashed_messages
+from flask import (render_template,
+                   request,
+                   redirect,
+                   url_for,
+                   flash,
+                   get_flashed_messages)
 from validators import url
 
 app = app
@@ -48,7 +53,6 @@ def show_urls():
 def show_url(id):
     url, date = get_url_by_id(id)
     message = get_flashed_messages(with_categories=True)
-    print(message)
     return render_template(
         'show.html',
         id=id,
@@ -63,7 +67,7 @@ def validate_url(input_url):
 
 
 def save_url(input_url):
-    connection = psycopg2.connect(DATABASE_URL)
+    connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
         curs.execute('INSERT INTO urls (name, created_at) VALUES (%s, %s);',
                      (input_url, datetime.now(),))
@@ -71,9 +75,10 @@ def save_url(input_url):
 
 
 def get_url_by_id(id):
-    connection = psycopg2.connect(DATABASE_URL)
+    connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
-        curs.execute('SELECT name, created_at FROM urls WHERE id = %s;', (id,), )
+        curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
+                     (id,), )
         url = curs.fetchone()
         if url is None:
             return [None, None]
@@ -81,20 +86,21 @@ def get_url_by_id(id):
 
 
 def get_id_by_url(input_url):
-    connection = psycopg2.connect(DATABASE_URL)
+    connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
         curs.execute('SELECT id FROM urls WHERE name=%s;', (input_url,))
         return curs.fetchone()[0]
 
+
 def get_all_urls():
-    connection = psycopg2.connect(DATABASE_URL)
+    connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
         curs.execute('SELECT name FROM urls;')
         return curs.fetchall()
 
 
 def get_all_sites():
-    connection = psycopg2.connect(DATABASE_URL)
+    connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
         curs.execute('SELECT * FROM urls ORDER BY created_at DESC, id DESC;')
         return curs.fetchall()

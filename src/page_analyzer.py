@@ -1,7 +1,7 @@
 from datetime import datetime
-
 import psycopg
-
+from psycopg.rows import dict_row
+import requests
 from src import app, DATABASE_URL
 from flask import (render_template,
                    request,
@@ -43,6 +43,7 @@ def handler_form():
 @app.route('/urls')
 def show_urls():
     sites = get_all_sites()
+    print(sites)
     return render_template(
         'show_all.html',
         sites=sites,
@@ -51,7 +52,7 @@ def show_urls():
 
 @app.route('/urls/<int:id>')
 def show_url(id):
-    url, date = get_url_by_id(id)
+    url, date = get_site_by_id(id)
     message = get_flashed_messages(with_categories=True)
     return render_template(
         'show.html',
@@ -67,19 +68,26 @@ def show_url(id):
 def check_url(id):
     connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
-        curs.execute('''
-        INSERT INTO url_checks (url_id, created_at) VALUES (%s, %s);
-        ''',
-                     (id, datetime.now(),))
-        connection.commit()
+        try:
+            url = get_url_by_id(id)
+            response = requests.get(url)
+            status_code = response.status_code
+            curs.execute(
+                '''INSERT INTO url_checks (url_id, status_code, created_at)
+                VALUES (%s, %s, %s);''',
+                (id, status_code, datetime.now(),))
+            connection.commit()
+        except requests.RequestException:
+            flash('Произошла ошибка при проверке', 'error')
+
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id), 302)
 
 
 def get_checks(url_id):
     connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
-        curs.execute('''SELECT id, created_at FROM url_checks
+    with connection.cursor(row_factory=dict_row) as curs:
+        curs.execute('''SELECT id, status_code, created_at FROM url_checks
         WHERE url_id=%s ORDER BY created_at DESC, id DESC;''', (url_id,))
         checks = curs.fetchall()
     return checks
@@ -97,15 +105,23 @@ def save_url(input_url):
         connection.commit()
 
 
-def get_url_by_id(id):
+def get_site_by_id(id):
     connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
         curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
                      (id,), )
-        url = curs.fetchone()
-        if url is None:
+        site = curs.fetchone()
+        if site is None:
             return [None, None]
-        return list(url)
+        return list(site)
+
+
+def get_url_by_id(id):
+    connection = psycopg.connect(DATABASE_URL)
+    with connection.cursor() as curs:
+        curs.execute('SELECT name FROM urls WHERE id = %s;',
+                     (id,), )
+        return curs.fetchone()[0]
 
 
 def get_id_by_url(input_url):
@@ -124,11 +140,14 @@ def get_all_urls():
 
 def get_all_sites():
     connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
+    with connection.cursor(row_factory=dict_row) as curs:
         curs.execute('''
         SELECT id, name FROM urls ORDER BY created_at DESC, id DESC;''')
         sites = curs.fetchall()
-    for i in range(len(sites)):
-        id = sites[i][0]
-        sites[i] = (sites[i] + (get_checks(id)[0][1],))
+    for site in sites:
+        id = site['id']
+        if get_checks(id):
+            last_check = get_checks(id)[0]
+            site['status_code'] = last_check['status_code']
+            site['last_check'] = last_check['created_at']
     return sites

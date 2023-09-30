@@ -42,10 +42,10 @@
     <tbody>
     {% for site in sites %}
         <tr>
-          <td>{{ site[0] }}</td>
-          <td><a href="/urls/{{ site[0] }}">{{ site[1] }}</a></td>
-          <td>{{ site[2] }}</td>
-          <td>200</td>
+          <td>{{ site.id }}</td>
+          <td><a href="/urls/{{ site.id }}">{{ site.name }}</a></td>
+          <td>{{ site.last_check }}</td>
+          <td>{{ site.status_code }}</td>
         </tr>
     {% endfor %}
 

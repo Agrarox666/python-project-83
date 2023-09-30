@@ -59,7 +59,30 @@ def show_url(id):
         url=url,
         date=date,
         message=message,
+        checks=get_checks(id),
     )
+
+
+@app.route('/urls/<int:id>/checks', methods=['POST'])
+def check_url(id):
+    connection = psycopg.connect(DATABASE_URL)
+    with connection.cursor() as curs:
+        curs.execute('''
+        INSERT INTO url_checks (url_id, created_at) VALUES (%s, %s);
+        ''',
+                     (id, datetime.now(),))
+        connection.commit()
+    flash('Страница успешно проверена', 'success')
+    return redirect(url_for('show_url', id=id), 302)
+
+
+def get_checks(url_id):
+    connection = psycopg.connect(DATABASE_URL)
+    with connection.cursor() as curs:
+        curs.execute('''SELECT id, created_at FROM url_checks
+        WHERE url_id=%s ORDER BY created_at DESC, id DESC;''', (url_id,))
+        checks = curs.fetchall()
+    return checks
 
 
 def validate_url(input_url):
@@ -102,5 +125,10 @@ def get_all_urls():
 def get_all_sites():
     connection = psycopg.connect(DATABASE_URL)
     with connection.cursor() as curs:
-        curs.execute('SELECT * FROM urls ORDER BY created_at DESC, id DESC;')
-        return curs.fetchall()
+        curs.execute('''
+        SELECT id, name FROM urls ORDER BY created_at DESC, id DESC;''')
+        sites = curs.fetchall()
+    for i in range(len(sites)):
+        id = sites[i][0]
+        sites[i] = (sites[i] + (get_checks(id)[0][1],))
+    return sites

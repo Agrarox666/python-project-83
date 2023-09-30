@@ -47,6 +47,38 @@
       </tbody>
     </table>
   </div>
+     <h2 class="mt-5 mb-3">Проверки</h2>
+    <form method="post" action="/urls/{{ id }}/checks">
+    <input type="submit" class="btn btn-primary" value="Запустить проверку">
+    </form>
+
+  <div>
+    <table class="table table-bordered table-hover mt-2" data-test="checks">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Код ответа</th>
+        <th>h1</th>
+        <th>title</th>
+        <th>description</th>
+        <th>Дата создания</th>
+      </tr>
+    </thead>
+      <tbody>
+      {% if checks %}
+        {% for check in checks %}
+          <tr>
+            <td> {{ check[0] }}</td>
+            <td></td>
+            <td></td>
+            <td></td></td>
+            <td>{{ check[1] }}</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+    </table>
+  </div>
   </main>
   <footer class="border-top py-3 mt-5 flex-shrink-0">
   <div class="container-lg">

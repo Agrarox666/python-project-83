@@ -2,7 +2,7 @@ from datetime import datetime
 import psycopg
 from psycopg.rows import dict_row
 import requests
-from src import app, DATABASE_URL
+from src import *
 from flask import (render_template,
                    request,
                    redirect,
@@ -17,7 +17,7 @@ app = app
 @app.route('/')
 def handler():
     return render_template(
-        'index.html')
+        index)
 
 
 @app.route('/urls', methods=['POST'])
@@ -26,7 +26,7 @@ def handler_form():
     error = not validate_url(input_url)
     if error:
         return render_template(
-            'index.html',
+            index,
             error=error,
         ), 422
 
@@ -43,19 +43,20 @@ def handler_form():
 @app.route('/urls')
 def show_urls():
     sites = get_all_sites()
-    print(sites)
     return render_template(
-        'show_all.html',
+        show_all,
         sites=sites,
     )
 
 
 @app.route('/urls/<int:id>')
 def show_url(id):
-    url, date = get_site_by_id(id)
+    site = get_site_by_id(id)
+    url = site['name']
+    date = site['created_at']
     message = get_flashed_messages(with_categories=True)
     return render_template(
-        'show.html',
+        show,
         id=id,
         url=url,
         date=date,
@@ -107,13 +108,11 @@ def save_url(input_url):
 
 def get_site_by_id(id):
     connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
+    with connection.cursor(row_factory=dict_row) as curs:
         curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
                      (id,), )
         site = curs.fetchone()
-        if site is None:
-            return [None, None]
-        return list(site)
+    return site
 
 
 def get_url_by_id(id):

@@ -3,9 +3,14 @@ name = "hexlet-code"
 version = "0.1.0"
 description = "Simple page analyze program for learning Flask and web dev"
 authors = ["Igor Loskutov <omfi017@gmail.com>"]
-
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3.0",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"]
 packages = [
-    {include = "hexlet-code"}]
+    {include = "src"}]
+
 [tool.poetry.dependencies]
 python = "^3.10"
 Flask = "^2.3.3"

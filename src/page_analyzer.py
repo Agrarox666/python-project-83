@@ -10,8 +10,8 @@ from flask import (render_template,
                    get_flashed_messages)
 from bs4 import BeautifulSoup
 
-from src.db import get_checks, save_url, get_site_by_id, get_url_by_id, get_id_by_url, get_all_urls, \
-    get_all_sites
+from src.db import (get_checks, save_url, get_site_by_id,
+                    get_url_by_id, get_id_by_url, get_all_urls, get_all_sites)
 from src.validator import validate_url, normalize_url
 
 

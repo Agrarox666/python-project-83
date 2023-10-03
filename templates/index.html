@@ -195,10 +195,11 @@
 </nav>
 
   </header>
-
-  {% if error %}
-  <div class="alert alert-danger" role="alert">Некорректный URL</div>
-  {% endif %}
+  {% with message=message[0] %}
+    {% if message %}
+      <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
+    {% endif %}
+  {% endwith %}
 
   <main class="flex-grow-1">
     <div class="container-lg mt-3">

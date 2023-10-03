@@ -17,8 +17,12 @@ from src.validator import validate_url, normalize_url
 
 @app.route('/')
 def handler():
+    message = get_flashed_messages(with_categories=True)
+    print(message)
     return render_template(
-        index)
+        index,
+        message=message,
+    )
 
 
 @app.route('/urls', methods=['POST'])
@@ -26,10 +30,11 @@ def handler_form():
     input_url = request.form.to_dict()['url']
     error = not validate_url(input_url)
     if error:
-        return render_template(
-            index,
-            error=error,
-        ), 422
+        if input_url == '':
+            flash('URL обязателен', 'danger')
+        else:
+            flash('Некорректный URL', 'danger')
+        return redirect(url_for('handler'))
     normalized_url = normalize_url(input_url)
 
     if (normalized_url,) not in get_all_urls():

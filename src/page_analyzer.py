@@ -85,6 +85,7 @@ def check_url(id):
             connection.commit()
         except requests.RequestException:
             flash('Произошла ошибка при проверке', 'error')
+            redirect(url_for('show_url', id=id), 422)
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id), 302)

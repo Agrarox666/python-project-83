@@ -1,12 +1,4 @@
 [[package]]
-name = "beautifulsoup"
-version = "3.2.2"
-description = "Screen-scraping library"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.12.2"
 description = "Screen-scraping library"
@@ -98,14 +90,11 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "gunicorn"
-version = "21.2.0"
+version = "20.1.0"
 description = "WSGI HTTP Server for UNIX"
 category = "main"
 optional = false
 python-versions = ">=3.5"
-
-[package.dependencies]
-packaging = "*"
 
 [package.extras]
 eventlet = ["eventlet (>=0.24.1)"]
@@ -158,14 +147,6 @@ description = "McCabe checker, plugin for flake8"
 category = "main"
 optional = false
 python-versions = ">=3.6"
-
-[[package]]
-name = "packaging"
-version = "23.1"
-description = "Core utilities for Python packages"
-category = "main"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "psycopg"
@@ -306,10 +287,9 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "e13f3af7a8845a9e7b8ed4a3f3dd193283c3feebba44aa8f147c8148046e4da2"
+content-hash = "938ce32822713f62b38fc314269bf9a7e4957eb047ac00c716e67daf92cdce5a"
 
 [metadata.files]
-beautifulsoup = []
 beautifulsoup4 = []
 blinker = []
 certifi = []
@@ -324,7 +304,6 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 mccabe = []
-packaging = []
 psycopg = []
 pycodestyle = []
 pyflakes = []

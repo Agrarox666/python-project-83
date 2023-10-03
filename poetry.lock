@@ -1,4 +1,27 @@
 [[package]]
+name = "beautifulsoup"
+version = "3.2.2"
+description = "Screen-scraping library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "beautifulsoup4"
+version = "4.12.2"
+description = "Screen-scraping library"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.dependencies]
+soupsieve = ">1.2"
+
+[package.extras]
+html5lib = ["html5lib"]
+lxml = ["lxml"]
+
+[[package]]
 name = "blinker"
 version = "1.6.2"
 description = "Fast, simple object-to-object and broadcast signaling"
@@ -210,6 +233,14 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "soupsieve"
+version = "2.5"
+description = "A modern CSS selector implementation for Beautiful Soup."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -275,9 +306,11 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ff486f96a2bf62d2073239660dd88d9a2ac742d94029c44dae8293f07dab7bf9"
+content-hash = "e13f3af7a8845a9e7b8ed4a3f3dd193283c3feebba44aa8f147c8148046e4da2"
 
 [metadata.files]
+beautifulsoup = []
+beautifulsoup4 = []
 blinker = []
 certifi = []
 charset-normalizer = []
@@ -297,6 +330,7 @@ pycodestyle = []
 pyflakes = []
 python-dotenv = []
 requests = []
+soupsieve = []
 typing-extensions = []
 tzdata = []
 urllib3 = []

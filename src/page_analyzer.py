@@ -10,6 +10,7 @@ from flask import (render_template,
                    flash,
                    get_flashed_messages)
 from validators import url
+from bs4 import BeautifulSoup
 
 app = app
 
@@ -71,12 +72,14 @@ def check_url(id):
     with connection.cursor() as curs:
         try:
             url = get_url_by_id(id)
-            response = requests.get(url)
-            status_code = response.status_code
+            seo = check_seo(url)
+            # values_tuple = ('url_id',) + tuple(params.values())
+            print(f'seo = {seo}')
             curs.execute(
-                '''INSERT INTO url_checks (url_id, status_code, created_at)
-                VALUES (%s, %s, %s);''',
-                (id, status_code, datetime.now(),))
+                f'''INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s);''',
+                (id, seo['status_code'], seo['h1'], seo['title'], seo['description'], seo['created_at']), )
+
             connection.commit()
         except requests.RequestException:
             flash('Произошла ошибка при проверке', 'error')
@@ -88,7 +91,7 @@ def check_url(id):
 def get_checks(url_id):
     connection = psycopg.connect(DATABASE_URL)
     with connection.cursor(row_factory=dict_row) as curs:
-        curs.execute('''SELECT id, status_code, created_at FROM url_checks
+        curs.execute('''SELECT id, status_code, h1, title, description, created_at FROM url_checks
         WHERE url_id=%s ORDER BY created_at DESC, id DESC;''', (url_id,))
         checks = curs.fetchall()
     return checks
@@ -150,3 +153,27 @@ def get_all_sites():
             site['status_code'] = last_check['status_code']
             site['last_check'] = last_check['created_at']
     return sites
+
+
+def check_seo(input_url):
+    result = {'status_code': '',
+              'h1': '',
+              'title': '',
+              'description': '',
+              'created_at': '',
+              }
+    try:
+        response = requests.get(input_url)
+        result['status_code'] = response.status_code
+        result['created_at'] = datetime.now().date()
+        html_doc = response.content
+        soup = BeautifulSoup(html_doc, 'html.parser')
+        if soup.h1: result['h1'] = soup.h1.string
+        if soup.title: result['title'] = soup.title.string
+        meta = soup.find('meta', attrs={'name': 'description'})
+        result['description'] = meta['content']
+
+    except AttributeError as error:
+        print(error)
+    finally:
+        return result

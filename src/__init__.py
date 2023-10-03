@@ -12,4 +12,4 @@ show = 'show.html'
 show_all = 'show_all.html'
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
-__all__ = ['app', 'index', 'show_all', 'show', 'DATABASE_URL']  # Доступ на уровне пакета
+__all__ = ['app', 'index', 'show_all', 'show', 'DATABASE_URL']

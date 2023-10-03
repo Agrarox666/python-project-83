@@ -1,18 +1,18 @@
 from datetime import datetime
 import psycopg
-from psycopg.rows import dict_row
 import requests
-from src import *
+from src import DATABASE_URL, app, index, show_all, show
 from flask import (render_template,
                    request,
                    redirect,
                    url_for,
                    flash,
                    get_flashed_messages)
-from validators import url
 from bs4 import BeautifulSoup
 
-app = app
+from src.db import get_checks, save_url, get_site_by_id, get_url_by_id, get_id_by_url, get_all_urls, \
+    get_all_sites
+from src.validator import validate_url, normalize_url
 
 
 @app.route('/')
@@ -30,14 +30,15 @@ def handler_form():
             index,
             error=error,
         ), 422
+    normalized_url = normalize_url(input_url)
 
     if (input_url,) not in get_all_urls():
-        save_url(input_url)
+        save_url(normalized_url)
         flash('Страница успешно добавлена', 'success')
     else:
         flash('Страница уже существует', 'info')
 
-    id = get_id_by_url(input_url)
+    id = get_id_by_url(normalized_url)
     return redirect(url_for('show_url', id=id), 302)
 
 
@@ -73,12 +74,13 @@ def check_url(id):
         try:
             url = get_url_by_id(id)
             seo = check_seo(url)
-            # values_tuple = ('url_id',) + tuple(params.values())
-            print(f'seo = {seo}')
-            curs.execute(
-                f'''INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s);''',
-                (id, seo['status_code'], seo['h1'], seo['title'], seo['description'], seo['created_at']), )
+            params = (id, seo['status_code'],
+                      seo['h1'], seo['title'], seo['description'],
+                      seo['created_at'],)
+            query = '''INSERT INTO url_checks
+            (url_id, status_code, h1, title, description, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s);'''
+            curs.execute(query, params)
 
             connection.commit()
         except requests.RequestException:
@@ -86,73 +88,6 @@ def check_url(id):
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id), 302)
-
-
-def get_checks(url_id):
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor(row_factory=dict_row) as curs:
-        curs.execute('''SELECT id, status_code, h1, title, description, created_at FROM url_checks
-        WHERE url_id=%s ORDER BY created_at DESC, id DESC;''', (url_id,))
-        checks = curs.fetchall()
-    return checks
-
-
-def validate_url(input_url):
-    return True if url(input_url) else False
-
-
-def save_url(input_url):
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
-        curs.execute('INSERT INTO urls (name, created_at) VALUES (%s, %s);',
-                     (input_url, datetime.now(),))
-        connection.commit()
-
-
-def get_site_by_id(id):
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor(row_factory=dict_row) as curs:
-        curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
-                     (id,), )
-        site = curs.fetchone()
-    return site
-
-
-def get_url_by_id(id):
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
-        curs.execute('SELECT name FROM urls WHERE id = %s;',
-                     (id,), )
-        return curs.fetchone()[0]
-
-
-def get_id_by_url(input_url):
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
-        curs.execute('SELECT id FROM urls WHERE name=%s;', (input_url,))
-        return curs.fetchone()[0]
-
-
-def get_all_urls():
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor() as curs:
-        curs.execute('SELECT name FROM urls;')
-        return curs.fetchall()
-
-
-def get_all_sites():
-    connection = psycopg.connect(DATABASE_URL)
-    with connection.cursor(row_factory=dict_row) as curs:
-        curs.execute('''
-        SELECT id, name FROM urls ORDER BY created_at DESC, id DESC;''')
-        sites = curs.fetchall()
-    for site in sites:
-        id = site['id']
-        if get_checks(id):
-            last_check = get_checks(id)[0]
-            site['status_code'] = last_check['status_code']
-            site['last_check'] = last_check['created_at']
-    return sites
 
 
 def check_seo(input_url):
@@ -168,8 +103,10 @@ def check_seo(input_url):
         result['created_at'] = datetime.now().date()
         html_doc = response.content
         soup = BeautifulSoup(html_doc, 'html.parser')
-        if soup.h1: result['h1'] = soup.h1.string
-        if soup.title: result['title'] = soup.title.string
+        if soup.h1:
+            result['h1'] = soup.h1.string
+        if soup.title:
+            result['title'] = soup.title.string
         meta = soup.find('meta', attrs={'name': 'description'})
         result['description'] = meta['content']
 

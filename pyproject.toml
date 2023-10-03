@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Simple page analyze program for learning Flask and web dev"
 authors = ["Igor Loskutov <omfi017@gmail.com>"]
 
+packages = [
+    {include = "hexlet-code"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 Flask = "^2.3.3"
@@ -18,5 +20,5 @@ gunicorn = "^20.1.0"
 [tool.poetry.dev-dependencies]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -32,7 +32,7 @@ def handler_form():
         ), 422
     normalized_url = normalize_url(input_url)
 
-    if (input_url,) not in get_all_urls():
+    if (normalized_url,) not in get_all_urls():
         save_url(normalized_url)
         flash('Страница успешно добавлена', 'success')
     else:

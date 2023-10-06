@@ -1,5 +1,4 @@
 import os
-
 import requests
 from dotenv import load_dotenv
 from flask import (render_template,
@@ -8,90 +7,25 @@ from flask import (render_template,
                    url_for,
                    flash,
                    get_flashed_messages, Flask)
+from page_analyzer.db import (get_all_urls,
+                              save_url,
+                              get_id_by_url,
+                              get_all_sites,
+                              get_site_by_id,
+                              get_checks,
+                              connection_to_db,
+                              get_url_by_id)
 from page_analyzer.seo_checker import check_seo
-
 from page_analyzer.validator import validate_url, normalize_url
-from datetime import datetime
 
-import psycopg2
-from psycopg2 import extras
+
 index = 'index.html'
 show = 'show.html'
 show_all = 'show_all.html'
-
 app = Flask(__name__)
 load_dotenv()
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
-
-
-def connection_to_db():
-    connection = psycopg2.connect(app.config['DATABASE_URL'])
-    return connection
-
-
-def get_checks(url_id):
-    query = '''SELECT id, status_code, h1, title, description, created_at
-    FROM url_checks
-    WHERE url_id=%s ORDER BY created_at DESC, id DESC;'''
-    conn = connection_to_db()
-    with (conn.cursor(cursor_factory=extras.RealDictCursor)as curs):
-        curs.execute(query, (url_id,))
-        checks = curs.fetchall()
-    return checks
-
-
-def save_url(input_url):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('INSERT INTO urls (name, created_at) VALUES (%s, %s);',
-                     (input_url, datetime.now(),))
-        conn.commit()
-
-
-def get_site_by_id(id):
-    conn = connection_to_db()
-    with conn.cursor(cursor_factory=extras.RealDictCursor) as curs:
-        curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
-                     (id,))
-        site = curs.fetchone()
-    return site
-
-
-def get_url_by_id(id):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT name FROM urls WHERE id = %s;',
-                     (id,), )
-        return curs.fetchone()[0]
-
-
-def get_id_by_url(input_url):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT id FROM urls WHERE name=%s;', (input_url,))
-        return curs.fetchone()[0]
-
-
-def get_all_urls():
-    with connection_to_db().cursor() as curs:
-        curs.execute('SELECT name FROM urls;')
-        return curs.fetchall()
-
-
-def get_all_sites():
-    conn = connection_to_db()
-    with conn.cursor(cursor_factory=extras.RealDictCursor) as curs:
-        curs.execute('''
-        SELECT id, name FROM urls ORDER BY created_at DESC, id DESC;''')
-        sites = curs.fetchall()
-    for site in sites:
-        id = site['id']
-        if get_checks(id):
-            last_check = get_checks(id)[0]
-            site['status_code'] = last_check['status_code']
-            site['last_check'] = last_check['created_at']
-    return sites
 
 
 @app.route('/')
@@ -101,7 +35,7 @@ def handler():
     )
 
 
-@app.route('/urls', methods=['POST'], strict_slashes=False)
+@app.route('/urls', methods=['POST'])
 def handler_form():
     input_url = request.form.to_dict()['url']
     error = not validate_url(input_url)

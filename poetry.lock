@@ -149,27 +149,7 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "psycopg"
-version = "3.1.12"
-description = "PostgreSQL database adapter for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-typing-extensions = ">=4.1"
-tzdata = {version = "*", markers = "sys_platform == \"win32\""}
-
-[package.extras]
-binary = ["psycopg-binary (==3.1.12)"]
-c = ["psycopg-c (==3.1.12)"]
-dev = ["black (>=23.1.0)", "dnspython (>=2.1)", "flake8 (>=4.0)", "mypy (>=1.4.1)", "types-setuptools (>=57.4)", "wheel (>=0.37)"]
-docs = ["Sphinx (>=5.0)", "furo (==2022.6.21)", "sphinx-autobuild (>=2021.3.14)", "sphinx-autodoc-typehints (>=1.12)"]
-pool = ["psycopg-pool"]
-test = ["anyio (>=3.6.2,<4.0)", "mypy (>=1.4.1)", "pproxy (>=2.7)", "pytest (>=6.2.5)", "pytest-cov (>=3.0)", "pytest-randomly (>=3.5)"]
-
-[[package]]
-name = "psycopg2"
+name = "psycopg2-binary"
 version = "2.9.9"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
 category = "main"
@@ -230,22 +210,6 @@ optional = false
 python-versions = ">=3.8"
 
 [[package]]
-name = "typing-extensions"
-version = "4.8.0"
-description = "Backported and Experimental Type Hints for Python 3.8+"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[[package]]
-name = "tzdata"
-version = "2023.3"
-description = "Provider of IANA time zone data"
-category = "main"
-optional = false
-python-versions = ">=2"
-
-[[package]]
 name = "urllib3"
 version = "2.0.5"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -295,7 +259,7 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "810a3a04c0e77b8be6f3937b3a9e9c900145c4ec92125ac0ab3b6f304ab1b186"
+content-hash = "82fe3ce3bd28d3b135a2784ba32d61746bd5503f868d1ab1d4e34fbe9c5a63b9"
 
 [metadata.files]
 beautifulsoup4 = []
@@ -312,15 +276,12 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 mccabe = []
-psycopg = []
-psycopg2 = []
+psycopg2-binary = []
 pycodestyle = []
 pyflakes = []
 python-dotenv = []
 requests = []
 soupsieve = []
-typing-extensions = []
-tzdata = []
 urllib3 = []
 validators = []
 werkzeug = []

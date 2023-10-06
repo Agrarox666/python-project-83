@@ -169,6 +169,14 @@ pool = ["psycopg-pool"]
 test = ["anyio (>=3.6.2,<4.0)", "mypy (>=1.4.1)", "pproxy (>=2.7)", "pytest (>=6.2.5)", "pytest-cov (>=3.0)", "pytest-randomly (>=3.5)"]
 
 [[package]]
+name = "psycopg2"
+version = "2.9.9"
+description = "psycopg2 - Python-PostgreSQL Database Adapter"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "pycodestyle"
 version = "2.11.0"
 description = "Python style guide checker"
@@ -287,7 +295,7 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "938ce32822713f62b38fc314269bf9a7e4957eb047ac00c716e67daf92cdce5a"
+content-hash = "810a3a04c0e77b8be6f3937b3a9e9c900145c4ec92125ac0ab3b6f304ab1b186"
 
 [metadata.files]
 beautifulsoup4 = []
@@ -305,6 +313,7 @@ jinja2 = []
 markupsafe = []
 mccabe = []
 psycopg = []
+psycopg2 = []
 pycodestyle = []
 pyflakes = []
 python-dotenv = []

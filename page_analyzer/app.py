@@ -7,7 +7,7 @@ from flask import (render_template,
                    redirect,
                    url_for,
                    flash,
-                   get_flashed_messages, Flask, abort)
+                   get_flashed_messages, Flask, abort, make_response)
 from page_analyzer.seo_checker import check_seo
 
 from page_analyzer.validator import validate_url, normalize_url
@@ -96,10 +96,8 @@ def get_all_sites():
 
 @app.route('/')
 def handler():
-    message = get_flashed_messages(with_categories=True)
     return render_template(
         index,
-        message=message,
     )
 
 
@@ -112,7 +110,7 @@ def handler_form():
             flash('URL обязателен', 'danger')
         else:
             flash('Некорректный URL', 'danger')
-        return abort(422), 422
+        return render_template(index), 422
     normalized_url = normalize_url(input_url)
 
     if (normalized_url,) not in get_all_urls():

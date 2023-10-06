@@ -195,9 +195,11 @@
 </nav>
 
   </header>
-  {% with message=message[0] %}
-    {% if message %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% with message = messages[0] %}
       <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
+        {% endwith %}
     {% endif %}
   {% endwith %}
 

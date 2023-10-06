@@ -7,7 +7,7 @@ from flask import (render_template,
                    redirect,
                    url_for,
                    flash,
-                   get_flashed_messages, Flask, abort, make_response)
+                   get_flashed_messages, Flask)
 from page_analyzer.seo_checker import check_seo
 
 from page_analyzer.validator import validate_url, normalize_url

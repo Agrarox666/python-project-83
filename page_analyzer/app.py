@@ -168,7 +168,7 @@ def checks(id):
             conn.commit()
         except requests.RequestException:
             flash('Произошла ошибка при проверке', 'error')
-            redirect(url_for('show_url', id=id), 422)
+            redirect(url_for('show_url', id=id))
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id), 302)

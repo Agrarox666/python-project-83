@@ -157,6 +157,8 @@ def checks(id):
         try:
             url = get_url_by_id(id)
             seo = check_seo(url)
+            if seo['status_code'] != 200:
+                raise requests.RequestException
             params = (id, seo['status_code'],
                       seo['h1'], seo['title'], seo['description'],
                       seo['created_at'],)

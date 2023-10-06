@@ -112,7 +112,7 @@ def handler_form():
             flash('URL обязателен', 'danger')
         else:
             flash('Некорректный URL', 'danger')
-        abort(422)
+        return abort(422), 422
     normalized_url = normalize_url(input_url)
 
     if (normalized_url,) not in get_all_urls():

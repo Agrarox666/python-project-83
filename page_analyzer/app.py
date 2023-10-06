@@ -7,7 +7,7 @@ from flask import (render_template,
                    redirect,
                    url_for,
                    flash,
-                   get_flashed_messages, Flask)
+                   get_flashed_messages, Flask, abort)
 from page_analyzer.seo_checker import check_seo
 
 from page_analyzer.validator import validate_url, normalize_url
@@ -103,7 +103,7 @@ def handler():
     )
 
 
-@app.route('/urls', methods=['POST'])
+@app.route('/urls', methods=['POST'], strict_slashes=False)
 def handler_form():
     input_url = request.form.to_dict()['url']
     error = not validate_url(input_url)
@@ -112,7 +112,7 @@ def handler_form():
             flash('URL обязателен', 'danger')
         else:
             flash('Некорректный URL', 'danger')
-        return redirect(url_for('handler'), 422)
+        abort(422)
     normalized_url = normalize_url(input_url)
 
     if (normalized_url,) not in get_all_urls():
@@ -174,3 +174,13 @@ def checks(id):
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id), 302)
+
+
+@app.errorhandler(422)
+def handler422(message):
+    print(message)
+    message = get_flashed_messages(with_categories=True)
+    return render_template(
+        index,
+        message=message,
+    )

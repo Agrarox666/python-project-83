@@ -114,7 +114,6 @@ def checks(id):
 
 @app.errorhandler(404)
 def handler404(message):
-    message = get_flashed_messages(with_categories=True)
     return render_template(
         'error.html',
         message=message,
@@ -132,7 +131,6 @@ def handler422(message):
 
 @app.errorhandler(500)
 def handler500(message):
-    message = get_flashed_messages(with_categories=True)
     return render_template(
         'error.html',
         message=message,

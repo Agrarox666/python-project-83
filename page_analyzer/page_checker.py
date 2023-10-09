@@ -1,6 +1,7 @@
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+from requests import HTTPError
 
 
 def check_page(input_url):
@@ -22,8 +23,7 @@ def check_page(input_url):
             result['title'] = soup.title.string
         meta = soup.find('meta', attrs={'name': 'description'})
         result['description'] = meta['content']
-
-    except AttributeError as error:
-        print(error)
-    finally:
+        return result
+    except HTTPError as error:
+        result['status_code'] = error.response.status_code
         return result

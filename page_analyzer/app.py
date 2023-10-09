@@ -116,7 +116,7 @@ def checks(id):
 def handler404(message):
     message = get_flashed_messages(with_categories=True)
     return render_template(
-        'main.html',
+        'error.html',
         message=message,
     )
 
@@ -125,7 +125,7 @@ def handler404(message):
 def handler422(message):
     message = get_flashed_messages(with_categories=True)
     return render_template(
-        'main.html',
+        'error.html',
         message=message,
     )
 
@@ -134,6 +134,6 @@ def handler422(message):
 def handler500(message):
     message = get_flashed_messages(with_categories=True)
     return render_template(
-        'main.html',
+        'error.html',
         message=message,
     )

@@ -1,11 +1,11 @@
-Simple Page Analyzer
-### Hexlet tests and linter status: [![Actions Status](https://github.com/Agrarox666/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/Agrarox666/python-project-83/actions)
-### Maintainability: [![Maintainability](https://api.codeclimate.com/v1/badges/2d6bb0c4fabd2caa7a0d/maintainability)](https://codeclimate.com/github/Agrarox666/python-project-83/maintainability)
+# Page Analyzer (educational project)
+Hexlet tests and linter status: [![Actions Status](https://github.com/Agrarox666/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/Agrarox666/python-project-83/actions)
+Code cleanliness: [![Maintainability](https://api.codeclimate.com/v1/badges/2d6bb0c4fabd2caa7a0d/maintainability)](https://codeclimate.com/github/Agrarox666/python-project-83/maintainability)
 
 Try it: https://firstpageanalyzer74.onrender.com
 
 ## Contents
-- [Requirements](#Requirements)
+- [Requirements](#requirements)
 - [Packages](#packages)
 - [Installation](#installation)
 - [Quick start](#quick-start)

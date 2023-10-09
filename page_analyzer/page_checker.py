@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def check_seo(input_url):
+def check_page(input_url):
     result = {'status_code': '',
               'h1': '',
               'title': '',

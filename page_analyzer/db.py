@@ -1,15 +1,8 @@
 from datetime import datetime
 
-import psycopg2
 from psycopg2 import extras
 
-import page_analyzer.app
-
-
-def connection_to_db():
-    db = page_analyzer.app.config['DATABASE_URL']
-    connection = psycopg2.connect(db)
-    return connection
+from page_analyzer.app import connection_to_db
 
 
 def get_checks(url_id):

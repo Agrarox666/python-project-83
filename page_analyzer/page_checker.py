@@ -13,6 +13,7 @@ def check_page(input_url):
               }
     try:
         response = requests.get(input_url)
+        response.raise_for_status()
         result['status_code'] = response.status_code
         result['created_at'] = datetime.now().date()
         html_doc = response.content

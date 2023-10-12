@@ -1,7 +1,4 @@
 import os
-from datetime import datetime
-
-import psycopg2
 import requests
 from dotenv import load_dotenv
 from flask import (render_template,
@@ -10,9 +7,15 @@ from flask import (render_template,
                    url_for,
                    flash,
                    get_flashed_messages, Flask)
-from psycopg2 import extras
 from requests import HTTPError
-
+from page_analyzer.db import (get_checks,
+                              connection_to_db,
+                              save_url,
+                              get_site_by_id,
+                              get_url_by_id,
+                              get_id_by_url,
+                              get_all_urls,
+                              get_all_sites)
 from page_analyzer.page_checker import check_page
 from page_analyzer.validator import validate_url, normalize_url
 
@@ -20,12 +23,6 @@ app = Flask(__name__)
 load_dotenv()
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
-
-
-def connection_to_db():
-    db = app.config['DATABASE_URL']
-    connection = psycopg2.connect(db)
-    return connection
 
 
 @app.route('/')
@@ -129,68 +126,3 @@ def handler500(message):
         'errors/500.html',
         message=message,
     )
-
-
-def get_checks(url_id):
-    query = '''SELECT id, status_code, h1, title, description, created_at
-    FROM url_checks
-    WHERE url_id=%s ORDER BY created_at DESC, id DESC;'''
-    conn = connection_to_db()
-    with (conn.cursor(cursor_factory=extras.RealDictCursor) as curs):
-        curs.execute(query, (url_id,))
-        checks = curs.fetchall()
-    return checks
-
-
-def save_url(input_url):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('INSERT INTO urls (name, created_at) VALUES (%s, %s);',
-                     (input_url, datetime.now(),))
-        conn.commit()
-
-
-def get_site_by_id(id):
-    conn = connection_to_db()
-    with conn.cursor(cursor_factory=extras.RealDictCursor) as curs:
-        curs.execute('SELECT name, created_at FROM urls WHERE id = %s;',
-                     (id,))
-        site = curs.fetchone()
-    return site
-
-
-def get_url_by_id(id):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT name FROM urls WHERE id = %s;',
-                     (id,), )
-        return curs.fetchone()[0]
-
-
-def get_id_by_url(input_url):
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT id FROM urls WHERE name=%s;', (input_url,))
-        return curs.fetchone()[0]
-
-
-def get_all_urls():
-    conn = connection_to_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT name FROM urls;')
-        return curs.fetchall()
-
-
-def get_all_sites():
-    conn = connection_to_db()
-    with conn.cursor(cursor_factory=extras.RealDictCursor) as curs:
-        curs.execute('''
-        SELECT id, name FROM urls ORDER BY created_at DESC, id DESC;''')
-        sites = curs.fetchall()
-    for site in sites:
-        id = site['id']
-        if get_checks(id):
-            last_check = get_checks(id)[0]
-            site['status_code'] = last_check['status_code']
-            site['last_check'] = last_check['created_at']
-    return sites

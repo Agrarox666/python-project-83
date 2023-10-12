@@ -11,6 +11,7 @@ from flask import (render_template,
                    flash,
                    get_flashed_messages, Flask)
 from psycopg2 import extras
+from requests import HTTPError
 
 from page_analyzer.page_checker import check_page
 from page_analyzer.validator import validate_url, normalize_url
@@ -87,19 +88,17 @@ def checks(id):
     with conn.cursor() as curs:
         try:
             url = get_url_by_id(id)
-            seo = check_page(url)
-            if seo['status_code'] != 200:
-                raise requests.RequestException
-            params = (id, seo['status_code'],
-                      seo['h1'], seo['title'], seo['description'],
-                      seo['created_at'],)
+            check_result = check_page(url)
+            params = (id, check_result['status_code'],
+                      check_result['h1'], check_result['title'],
+                      check_result['description'],
+                      check_result['created_at'],)
             query = '''INSERT INTO url_checks
                 (url_id, status_code, h1, title, description, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s);'''
             curs.execute(query, params)
-
             conn.commit()
-        except requests.RequestException:
+        except (requests.RequestException, HTTPError):
             flash('Произошла ошибка при проверке', 'error')
             redirect(url_for('show_url', id=id))
 
@@ -110,16 +109,16 @@ def checks(id):
 @app.errorhandler(404)
 def handler404(message):
     return render_template(
-        'error.html',
+        'errors/404.html',
         message=message,
     )
 
 
 @app.errorhandler(422)
-def handler422(message):
+def handler422():
     message = get_flashed_messages(with_categories=True)
     return render_template(
-        'error.html',
+        'main.html',
         message=message,
     )
 
@@ -127,7 +126,7 @@ def handler422(message):
 @app.errorhandler(500)
 def handler500(message):
     return render_template(
-        'error.html',
+        'errors/500.html',
         message=message,
     )
 
@@ -137,7 +136,7 @@ def get_checks(url_id):
     FROM url_checks
     WHERE url_id=%s ORDER BY created_at DESC, id DESC;'''
     conn = connection_to_db()
-    with (conn.cursor(cursor_factory=extras.RealDictCursor)as curs):
+    with (conn.cursor(cursor_factory=extras.RealDictCursor) as curs):
         curs.execute(query, (url_id,))
         checks = curs.fetchall()
     return checks

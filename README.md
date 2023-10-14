@@ -20,7 +20,7 @@ Try it: https://firstpageanalyzer74.onrender.com
 1. Flask v2.3.3 https://flask.palletsprojects.com/en/3.0.x/
 2. Requests v2.31.0 https://requests.readthedocs.io/en/latest/
 3. Gunicorn v20.1.0 https://docs.gunicorn.org/en/latest/
-4. Psycopg v2.9.9
+4. Psycopg v2.9.9 https://www.psycopg.org/docs/
 
 ## Installation
 1. Clone this repository to your computer by command:

@@ -1,4 +1,5 @@
 import os
+import psycopg2
 import requests
 from dotenv import load_dotenv
 from flask import (render_template,
@@ -9,7 +10,6 @@ from flask import (render_template,
                    get_flashed_messages, Flask)
 from requests import HTTPError
 from page_analyzer.db import (get_checks,
-                              connection_to_db,
                               save_url,
                               get_site_by_id,
                               get_url_by_id,
@@ -23,6 +23,10 @@ app = Flask(__name__)
 load_dotenv()
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
+
+
+def connection_to_db():
+    return psycopg2.connect(app.config['DATABASE_URL'])
 
 
 @app.route('/')
@@ -44,19 +48,19 @@ def handler_form():
         return render_template('main.html'), 422
 
     normalized_url = normalize_url(input_url)
-    if (normalized_url,) not in get_all_urls():
-        save_url(normalized_url)
+    if (normalized_url,) not in get_all_urls(connection_to_db()):
+        save_url(normalized_url, connection_to_db())
         flash('Страница успешно добавлена', 'success')
     else:
         flash('Страница уже существует', 'info')
 
-    id = get_id_by_url(normalized_url)
+    id = get_id_by_url(normalized_url, connection_to_db())
     return redirect(url_for('show_url', id=id), 302)
 
 
 @app.route('/urls')
 def show_urls():
-    sites = get_all_sites()
+    sites = get_all_sites(connection_to_db())
     return render_template(
         'show_all.html',
         sites=sites,
@@ -65,7 +69,7 @@ def show_urls():
 
 @app.route('/urls/<int:id>')
 def show_url(id):
-    site = get_site_by_id(id)
+    site = get_site_by_id(id, connection_to_db())
     url = site['name']
     date = site['created_at']
     message = get_flashed_messages(with_categories=True)
@@ -75,7 +79,7 @@ def show_url(id):
         url=url,
         date=date,
         message=message,
-        checks=get_checks(id),
+        checks=get_checks(id, connection_to_db()),
     )
 
 
@@ -84,7 +88,7 @@ def checks(id):
     conn = connection_to_db()
     with conn.cursor() as curs:
         try:
-            url = get_url_by_id(id)
+            url = get_url_by_id(id, connection_to_db())
             check_result = check_page(url)
             params = (id, check_result['status_code'],
                       check_result['h1'], check_result['title'],

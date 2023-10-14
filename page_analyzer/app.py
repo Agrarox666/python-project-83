@@ -42,8 +42,8 @@ def handler_form():
         else:
             flash('Некорректный URL', 'danger')
         return render_template('main.html'), 422
-    normalized_url = normalize_url(input_url)
 
+    normalized_url = normalize_url(input_url)
     if (normalized_url,) not in get_all_urls():
         save_url(normalized_url)
         flash('Страница успешно добавлена', 'success')
@@ -108,7 +108,7 @@ def handler404(message):
     return render_template(
         'errors/404.html',
         message=message,
-    )
+    ), 404
 
 
 @app.errorhandler(422)
@@ -117,7 +117,7 @@ def handler422():
     return render_template(
         'main.html',
         message=message,
-    )
+    ), 422
 
 
 @app.errorhandler(500)
@@ -125,4 +125,4 @@ def handler500(message):
     return render_template(
         'errors/500.html',
         message=message,
-    )
+    ), 500

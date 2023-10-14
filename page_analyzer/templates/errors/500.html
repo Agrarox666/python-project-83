@@ -1,3 +1,6 @@
 {% extends "base.html" %}
 {% block title %} 500 {% endblock %}
-<h1>{% block content %} Произошла ошибка {% endblock %}</h1>
+{% block content %}
+<h1> Произошла ошибка </h1>
+{{ message }}
+{% endblock %}

@@ -100,7 +100,7 @@ def checks(id):
             curs.execute(query, params)
             conn.commit()
         except (requests.RequestException, HTTPError):
-            flash('Произошла ошибка при проверке', 'error')
+            flash('Произошла ошибка при проверке', 'danger')
             redirect(url_for('show_url', id=id))
 
     flash('Страница успешно проверена', 'success')
